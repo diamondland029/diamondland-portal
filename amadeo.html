@@ -85,13 +85,13 @@
                 <div id="statusBig" class="text-center mb-3"></div>
                 <div class="row">
                     <div class="col-6">
+                        <p>Property: <span id="modalProject" class="fw-bold text-warning"></span></p>
                         <p>B/L: <span id="modalBL" class="fw-bold"></span></p>
                         <p>Lot Area: <span id="modalArea" class="fw-bold text-info"></span> sqm</p>
                         <p>Monthly Terms: <span id="modalTerm" class="fw-bold"></span> Mos</p>
-                        <p>Paid: <span id="modalPaid" class="text-success fw-bold"></span></p>
                     </div>
                     <div class="col-6 text-end">
-                        <p>Due Day: <span id="modalDue" class="text-warning fw-bold"></span></p>
+                        <p>Paid: <span id="modalPaid" class="text-success fw-bold"></span></p>
                         <p>Total TCP: <span id="modalTotal" class="fw-bold"></span></p>
                         <p>Balance: <span id="modalBalance" class="text-danger fw-bold"></span></p>
                         <p>Paid Until: <span id="modalPaidUntil" class="fw-bold text-info"></span></p>
@@ -116,7 +116,6 @@
         document.getElementById('title').innerText = PROPERTY_NAME + " Property";
         document.getElementById('payDate').valueAsDate = new Date();
 
-        // Helper para sa computation ng Paid Until
         function calculatePaidUntil(regDate, monthly, totalPaid) {
             if (!totalPaid || totalPaid <= 0 || !monthly || monthly <= 0) return "No payment yet";
             const monthsCovered = Math.floor(totalPaid / monthly);
@@ -143,9 +142,9 @@
                 list.innerHTML += `<div class="card-dark d-flex justify-content-between align-items-center shadow-sm">
                     <div onclick="showHistory('${id}')" style="flex-grow:1">
                         <b class="${bal <= 0 ? 'text-success' : 'gold-text'}" style="font-size:1.1rem">${c.name}</b><br>
-                        <small>B${c.block} L${c.lot} | <b>Area: ${c.lotArea || 0} sqm</b></small><br>
+                        <small class="text-white-50">Project: <b>${c.projectName || 'Not Specified'}</b></small><br>
+                        <small>B${c.block} L${c.lot} | Area: ${c.lotArea || 0} sqm</small><br>
                         <span class="text-info small fw-bold">Paid Until: ${paidUntil}</span><br>
-                        <span class="text-warning small">Due Day: ${c.dueDate}</span><br>
                         ${bal <= 0 ? '<span class="badge-paid mt-1 d-inline-block">FULLY PAID</span>' : ''}
                     </div>
                     <div class="text-end me-3" onclick="showHistory('${id}')">
@@ -164,10 +163,10 @@
             const paidUntil = calculatePaidUntil(c.registrationDate, c.monthly, c.paid);
             
             document.getElementById('modalName').innerText = c.name;
+            document.getElementById('modalProject').innerText = c.projectName || 'Not Specified';
             document.getElementById('modalBL').innerText = `Block ${c.block} Lot ${c.lot}`;
             document.getElementById('modalArea').innerText = c.lotArea || 0;
             document.getElementById('modalTerm').innerText = c.termsMonths;
-            document.getElementById('modalDue').innerText = c.dueDate;
             document.getElementById('modalTotal').innerText = "₱"+c.total.toLocaleString();
             document.getElementById('modalPaid').innerText = "₱"+c.paid.toLocaleString();
             document.getElementById('modalBalance').innerText = "₱"+bal.toLocaleString();
