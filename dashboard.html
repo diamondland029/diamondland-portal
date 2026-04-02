@@ -9,7 +9,6 @@
         body { background-color: #0d0d0d; color: white; font-family: 'Segoe UI', sans-serif; }
         .gold-text { color: #f1c40f; }
         
-        /* Box Styling */
         .card-dark { 
             background: #161616; 
             border: 1px solid #333; 
@@ -28,14 +27,16 @@
 
         .stat-box { 
             background: linear-gradient(145deg, #1e1e1e, #111); 
-            border: 1px solid #f1c40f; 
-            padding: 20px; 
+            border: 1px solid #333; 
+            padding: 15px; 
             border-radius: 12px; 
-            text-align: center; 
-            margin-bottom: 25px;
+            text-align: center;
+            height: 100%;
         }
+        .border-gold { border: 1px solid #f1c40f !important; }
+        .border-danger { border: 1px solid #ff4d4d !important; }
+        .border-success { border: 1px solid #28a745 !important; }
 
-        /* Property Status Scrollable Area */
         .slot-container { 
             max-height: 280px; 
             overflow-y: auto; 
@@ -78,16 +79,31 @@
         <a href="index.html" class="btn btn-outline-danger btn-sm">Log Out</a>
     </div>
 
-    <div class="stat-box">
-        <h5 class="text-uppercase small mb-2">Expected Collection (This Month)</h5>
-        <h2 class="gold-text fw-bold m-0" id="monthlyTotal">₱ 0.00</h2>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-box border-gold">
+                <h6 class="text-uppercase small mb-1 text-muted">Target Collection (Month)</h6>
+                <h3 class="gold-text fw-bold m-0" id="monthlyTotal">₱ 0.00</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-box border-success">
+                <h6 class="text-uppercase small mb-1 text-muted">Total Paid (This Month)</h6>
+                <h3 class="text-success fw-bold m-0" id="totalPaidMonth">₱ 0.00</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-box border-danger">
+                <h6 class="text-uppercase small mb-1 text-muted">Unpaid / Overdue</h6>
+                <h3 class="text-danger fw-bold m-0" id="totalUnpaid">₱ 0.00</h3>
+            </div>
+        </div>
     </div>
 
     <div class="row g-4">
         <div class="col-md-4 d-flex flex-column">
             <h4 class="section-title">PROPERTY STATUS</h4>
-            <div id="slotTracker" class="slot-container">
-                </div>
+            <div id="slotTracker" class="slot-container"></div>
 
             <h4 class="section-title">MANAGE PROPERTIES</h4>
             <div class="card-dark flex-grow-1">
@@ -103,52 +119,22 @@
 
         <div class="col-md-8 d-flex flex-column">
             <h4 class="section-title">SELECT PROPERTY</h4>
-            <div class="property-grid mb-3" id="propertyGrid">
-                </div>
+            <div class="property-grid mb-3" id="propertyGrid"></div>
 
             <h4 class="section-title">CLIENT REGISTRATION</h4>
             <div class="card-dark flex-grow-1">
                 <div class="row g-2">
-                    <div class="col-md-6">
-                        <label class="form-label">Full Name</label>
-                        <input id="name" class="form-control input-dark" placeholder="Juan Dela Cruz">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Location</label>
-                        <select id="location" class="form-select input-dark"></select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Block</label>
-                        <input id="block" class="form-control input-dark" placeholder="0">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Lot</label>
-                        <input id="lot" class="form-control input-dark" placeholder="0">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Lot Area (sqm)</label>
-                        <input id="lotArea" type="number" class="form-control input-dark" placeholder="0">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Total Price (TCP)</label>
-                        <input id="total" type="number" class="form-control input-dark" placeholder="0.00">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label gold-text">Monthly Pay</label>
-                        <input id="monthly" type="number" class="form-control input-dark" placeholder="0.00">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label gold-text">Due Day</label>
-                        <input id="dueDate" type="number" class="form-control input-dark" placeholder="1-31">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label gold-text">Terms (Months)</label>
-                        <input id="terms" type="number" class="form-control input-dark" placeholder="Mos">
-                    </div>
+                    <div class="col-md-6"><label class="form-label">Full Name</label><input id="name" class="form-control input-dark" placeholder="Juan Dela Cruz"></div>
+                    <div class="col-md-6"><label class="form-label">Location</label><select id="location" class="form-select input-dark"></select></div>
+                    <div class="col-md-3"><label class="form-label">Block</label><input id="block" class="form-control input-dark" placeholder="0"></div>
+                    <div class="col-md-3"><label class="form-label">Lot</label><input id="lot" class="form-control input-dark" placeholder="0"></div>
+                    <div class="col-md-6"><label class="form-label">Lot Area (sqm)</label><input id="lotArea" type="number" class="form-control input-dark" placeholder="0"></div>
+                    <div class="col-md-6"><label class="form-label">Total Price (TCP)</label><input id="total" type="number" class="form-control input-dark" placeholder="0.00"></div>
+                    <div class="col-md-4"><label class="form-label gold-text">Monthly Pay</label><input id="monthly" type="number" class="form-control input-dark" placeholder="0.00"></div>
+                    <div class="col-md-4"><label class="form-label gold-text">Due Day</label><input id="dueDate" type="number" class="form-control input-dark" placeholder="1-31"></div>
+                    <div class="col-md-4"><label class="form-label gold-text">Terms (Months)</label><input id="terms" type="number" class="form-control input-dark" placeholder="Mos"></div>
                 </div>
-                <button class="btn btn-warning w-100 mt-2 fw-bold py-2" style="background: #f1c40f; color: black;" id="saveBtn">
-                    REGISTER CLIENT
-                </button>
+                <button class="btn btn-warning w-100 mt-2 fw-bold py-2" style="background: #f1c40f; color: black;" id="saveBtn">REGISTER CLIENT</button>
             </div>
         </div>
     </div>
@@ -162,31 +148,46 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // IDINAGDAG ANG ALFONSO SA DEFAULT PROPERTIES
-    let DEFAULT_PROPS = { 
-        "Amadeo": 50, 
-        "Silang": 40, 
-        "Tagaytay": 30, 
-        "Indang": 60, 
-        "Siargao": 25,
-        "Alfonso": 40 
-    };
-
+    let DEFAULT_PROPS = { "Amadeo": 50, "Silang": 40, "Tagaytay": 30, "Indang": 60, "Siargao": 25, "Alfonso": 40 };
     let PROPERTIES = JSON.parse(localStorage.getItem('diamondland_props')) || DEFAULT_PROPS;
 
     async function loadDashboard() {
         const querySnapshot = await getDocs(collection(db, "clients"));
         const counts = {};
-        let monthlyExpected = 0;
+        let targetMonthly = 0;
+        let paidThisMonth = 0;
+        
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
         Object.keys(PROPERTIES).forEach(p => counts[p] = 0);
 
         querySnapshot.forEach((doc) => {
             const d = doc.data();
             if(counts[d.location] !== undefined) counts[d.location]++;
-            if(d.paid < d.total) monthlyExpected += (Number(d.monthly) || 0);
+            
+            // Monthly collection logic
+            if(d.paid < d.total) {
+                targetMonthly += (Number(d.monthly) || 0);
+                
+                // Check payment logs for this month
+                if(d.payments && Array.isArray(d.payments)) {
+                    d.payments.forEach(p => {
+                        const pDate = new Date(p.date);
+                        if(pDate.getMonth() === currentMonth && pDate.getFullYear() === currentYear) {
+                            paidThisMonth += Number(p.amount);
+                        }
+                    });
+                }
+            }
         });
 
-        document.getElementById('monthlyTotal').innerText = "₱ " + monthlyExpected.toLocaleString(undefined, {minimumFractionDigits: 2});
+        const unpaid = targetMonthly - paidThisMonth;
+
+        document.getElementById('monthlyTotal').innerText = "₱ " + targetMonthly.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('totalPaidMonth').innerText = "₱ " + paidThisMonth.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('totalUnpaid').innerText = "₱ " + (unpaid < 0 ? 0 : unpaid).toLocaleString(undefined, {minimumFractionDigits: 2});
 
         const trackerDiv = document.getElementById('slotTracker');
         const gridDiv = document.getElementById('propertyGrid');
@@ -197,16 +198,7 @@
         for (const [name, total] of Object.entries(PROPERTIES)) {
             const used = counts[name] || 0;
             const percent = (used / total) * 100;
-
-            trackerDiv.innerHTML += `
-                <div class="slot-card">
-                    <button class="btn-delete-prop" onclick="deleteProperty('${name}')">✖</button>
-                    <div class="d-flex justify-content-between mb-0 small">
-                        <span class="fw-bold">${name}</span>
-                        <span>${used}/${total}</span>
-                    </div>
-                    <div class="progress"><div class="progress-bar" style="width: ${percent}%"></div></div>
-                </div>`;
+            trackerDiv.innerHTML += `<div class="slot-card"><button class="btn-delete-prop" onclick="deleteProperty('${name}')">✖</button><div class="d-flex justify-content-between mb-0 small"><span class="fw-bold">${name}</span><span>${used}/${total}</span></div><div class="progress"><div class="progress-bar" style="width: ${percent}%"></div></div></div>`;
             gridDiv.innerHTML += `<a href="${name.toLowerCase()}.html" class="property-card">🏡 ${name}</a>`;
             locSelect.innerHTML += `<option value="${name}">${name}</option>`;
         }
@@ -218,16 +210,14 @@
         if(!name || !limit) return alert("Paki-lagay ang pangalan at limit.");
         PROPERTIES[name] = limit;
         localStorage.setItem('diamondland_props', JSON.stringify(PROPERTIES));
-        loadDashboard();
-        document.getElementById('newPropName').value = "";
-        document.getElementById('newPropLimit').value = "";
+        location.reload();
     };
 
     window.deleteProperty = (name) => {
         if(confirm(`Sigurado ka bang buburahin ang ${name}?`)) {
             delete PROPERTIES[name];
             localStorage.setItem('diamondland_props', JSON.stringify(PROPERTIES));
-            loadDashboard();
+            location.reload();
         }
     };
 
