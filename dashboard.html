@@ -162,7 +162,17 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    let PROPERTIES = JSON.parse(localStorage.getItem('diamondland_props')) || { "Amadeo": 50, "Silang": 40, "Tagaytay": 30, "Indang": 60, "Siargao": 25 };
+    // IDINAGDAG ANG ALFONSO SA DEFAULT PROPERTIES
+    let DEFAULT_PROPS = { 
+        "Amadeo": 50, 
+        "Silang": 40, 
+        "Tagaytay": 30, 
+        "Indang": 60, 
+        "Siargao": 25,
+        "Alfonso": 40 
+    };
+
+    let PROPERTIES = JSON.parse(localStorage.getItem('diamondland_props')) || DEFAULT_PROPS;
 
     async function loadDashboard() {
         const querySnapshot = await getDocs(collection(db, "clients"));
