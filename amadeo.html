@@ -12,11 +12,10 @@
         .card-dark { background: #161616; border: 1px solid #333; padding: 20px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; }
         .card-dark:hover { border-color: #f1c40f; }
         
-        /* UPDATED CSS: Para makita ang text sa input fields */
         .input-dark { 
             background: #1a1a1a !important; 
             border: 1px solid #333 !important; 
-            color: white !important; /* Ginawang puti ang text */
+            color: white !important; 
         }
         .input-dark::placeholder { color: #888 !important; }
         .input-dark:focus { 
@@ -26,7 +25,6 @@
             box-shadow: none; 
         }
         
-        /* Para sa dropdown list */
         select.input-dark option { background: #1a1a1a; color: white; }
 
         .modal-content { background: #161616; color: white; border: 1px solid #f1c40f; }
@@ -86,8 +84,18 @@
             <div class="modal-body">
                 <div id="statusBig" class="text-center mb-3"></div>
                 <div class="row">
-                    <div class="col-6"><p>B/L: <span id="modalBL" class="fw-bold"></span></p><p>Monthly Terms: <span id="modalTerm" class="fw-bold"></span> Mos</p><p>Paid: <span id="modalPaid" class="text-success fw-bold"></span></p></div>
-                    <div class="col-6 text-end"><p>Due Day: <span id="modalDue" class="text-warning fw-bold"></span></p><p>Total TCP: <span id="modalTotal" class="fw-bold"></span></p><p>Balance: <span id="modalBalance" class="text-danger fw-bold"></span></p></div>
+                    <div class="col-6">
+                        <p>B/L: <span id="modalBL" class="fw-bold"></span></p>
+                        <p>Lot Area: <span id="modalArea" class="fw-bold text-info"></span> sqm</p>
+                        <p>Monthly Terms: <span id="modalTerm" class="fw-bold"></span> Mos</p>
+                        <p>Paid: <span id="modalPaid" class="text-success fw-bold"></span></p>
+                    </div>
+                    <div class="col-6 text-end">
+                        <p>Due Day: <span id="modalDue" class="text-warning fw-bold"></span></p>
+                        <p>Total TCP: <span id="modalTotal" class="fw-bold"></span></p>
+                        <p>Balance: <span id="modalBalance" class="text-danger fw-bold"></span></p>
+                        <p>Paid Until: <span id="modalPaidUntil" class="fw-bold text-info"></span></p>
+                    </div>
                 </div>
                 <hr class="border-secondary"><h6>Payment History:</h6><div id="logs"></div>
             </div></div>
@@ -106,20 +114,37 @@
         
         let lastDeleted = null;
         document.getElementById('title').innerText = PROPERTY_NAME + " Property";
-
         document.getElementById('payDate').valueAsDate = new Date();
+
+        // Helper para sa computation ng Paid Until
+        function calculatePaidUntil(regDate, monthly, totalPaid) {
+            if (!totalPaid || totalPaid <= 0 || !monthly || monthly <= 0) return "No payment yet";
+            const monthsCovered = Math.floor(totalPaid / monthly);
+            const start = regDate ? new Date(regDate) : new Date();
+            const until = new Date(start);
+            until.setMonth(start.getMonth() + (monthsCovered - 1));
+            return until.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
+        }
 
         async function load() {
             const q = query(collection(db, "clients"), where("location", "==", PROPERTY_NAME));
-            const snap = await getDocs(q); const list = document.getElementById('list'); const sel = document.getElementById('clientSel');
+            const snap = await getDocs(q); 
+            const list = document.getElementById('list'); 
+            const sel = document.getElementById('clientSel');
             list.innerHTML = ""; sel.innerHTML = '<option value="">Choose Client...</option>';
+            
             snap.forEach(docSnap => {
-                const c = docSnap.data(); const id = docSnap.id; const bal = c.total - c.paid;
+                const c = docSnap.data(); 
+                const id = docSnap.id; 
+                const bal = c.total - c.paid;
+                const paidUntil = calculatePaidUntil(c.registrationDate, c.monthly, c.paid);
+
                 sel.innerHTML += `<option value="${id}">${c.name} (B${c.block} L${c.lot})</option>`;
                 list.innerHTML += `<div class="card-dark d-flex justify-content-between align-items-center shadow-sm">
                     <div onclick="showHistory('${id}')" style="flex-grow:1">
                         <b class="${bal <= 0 ? 'text-success' : 'gold-text'}" style="font-size:1.1rem">${c.name}</b><br>
-                        <small>B${c.block} L${c.lot} | Terms: ${c.termsMonths} Mos</small><br>
+                        <small>B${c.block} L${c.lot} | <b>Area: ${c.lotArea || 0} sqm</b></small><br>
+                        <span class="text-info small fw-bold">Paid Until: ${paidUntil}</span><br>
                         <span class="text-warning small">Due Day: ${c.dueDate}</span><br>
                         ${bal <= 0 ? '<span class="badge-paid mt-1 d-inline-block">FULLY PAID</span>' : ''}
                     </div>
@@ -136,22 +161,23 @@
             const res = await getDoc(doc(db, "clients", id)); 
             const c = res.data(); 
             const bal = c.total - c.paid;
+            const paidUntil = calculatePaidUntil(c.registrationDate, c.monthly, c.paid);
             
             document.getElementById('modalName').innerText = c.name;
             document.getElementById('modalBL').innerText = `Block ${c.block} Lot ${c.lot}`;
+            document.getElementById('modalArea').innerText = c.lotArea || 0;
             document.getElementById('modalTerm').innerText = c.termsMonths;
             document.getElementById('modalDue').innerText = c.dueDate;
             document.getElementById('modalTotal').innerText = "₱"+c.total.toLocaleString();
             document.getElementById('modalPaid').innerText = "₱"+c.paid.toLocaleString();
             document.getElementById('modalBalance').innerText = "₱"+bal.toLocaleString();
+            document.getElementById('modalPaidUntil').innerText = paidUntil;
             document.getElementById('statusBig').innerHTML = bal <= 0 ? '<h2 class="text-success fw-bold border border-success p-2 d-inline-block">✅ FULLY PAID</h2>' : '';
             
             const logs = document.getElementById('logs'); 
             logs.innerHTML = "";
             const history = c.payments || [];
-            
             history.sort((a, b) => new Date(a.date) - new Date(b.date));
-
             history.forEach(p => { 
                 logs.innerHTML += `<div class="d-flex justify-content-between border-bottom border-secondary py-2"><span>${p.date}</span><b>₱${p.amount.toLocaleString()}</b></div>`; 
             });
@@ -190,12 +216,12 @@
 
             const ref = doc(db, "clients", id); 
             const res = await getDoc(ref); 
-            const d = res.data();
+            const c = res.data();
             
             try {
                 await updateDoc(ref, { 
-                    paid: d.paid + amt, 
-                    payments: [...(d.payments || []), { amount: amt, date: finalDate }] 
+                    paid: (c.paid || 0) + amt, 
+                    payments: [...(c.payments || []), { amount: amt, date: finalDate }] 
                 });
                 alert("Payment Success!"); 
                 location.reload();
