@@ -126,6 +126,9 @@
                 <div class="row g-2">
                     <div class="col-md-6"><label class="form-label">Full Name</label><input id="name" class="form-control input-dark" placeholder="Juan Dela Cruz"></div>
                     <div class="col-md-6"><label class="form-label">Location</label><select id="location" class="form-select input-dark"></select></div>
+                    
+                    <div class="col-md-12"><label class="form-label text-info">Project / Property Name (e.g. Diamondland Phase 1)</label><input id="projectName" class="form-control input-dark" placeholder="Specify project name"></div>
+                    
                     <div class="col-md-3"><label class="form-label">Block</label><input id="block" class="form-control input-dark" placeholder="0"></div>
                     <div class="col-md-3"><label class="form-label">Lot</label><input id="lot" class="form-control input-dark" placeholder="0"></div>
                     <div class="col-md-6"><label class="form-label">Lot Area (sqm)</label><input id="lotArea" type="number" class="form-control input-dark" placeholder="0"></div>
@@ -167,11 +170,8 @@
             const d = doc.data();
             if(counts[d.location] !== undefined) counts[d.location]++;
             
-            // Monthly collection logic
             if(d.paid < d.total) {
                 targetMonthly += (Number(d.monthly) || 0);
-                
-                // Check payment logs for this month
                 if(d.payments && Array.isArray(d.payments)) {
                     d.payments.forEach(p => {
                         const pDate = new Date(p.date);
@@ -184,7 +184,6 @@
         });
 
         const unpaid = targetMonthly - paidThisMonth;
-
         document.getElementById('monthlyTotal').innerText = "₱ " + targetMonthly.toLocaleString(undefined, {minimumFractionDigits: 2});
         document.getElementById('totalPaidMonth').innerText = "₱ " + paidThisMonth.toLocaleString(undefined, {minimumFractionDigits: 2});
         document.getElementById('totalUnpaid').innerText = "₱ " + (unpaid < 0 ? 0 : unpaid).toLocaleString(undefined, {minimumFractionDigits: 2});
@@ -192,7 +191,6 @@
         const trackerDiv = document.getElementById('slotTracker');
         const gridDiv = document.getElementById('propertyGrid');
         const locSelect = document.getElementById('location');
-
         trackerDiv.innerHTML = ""; gridDiv.innerHTML = ""; locSelect.innerHTML = "";
 
         for (const [name, total] of Object.entries(PROPERTIES)) {
@@ -224,6 +222,7 @@
     document.getElementById('saveBtn').onclick = async () => {
         const name = document.getElementById('name').value;
         const loc = document.getElementById('location').value;
+        const pName = document.getElementById('projectName').value;
         const block = document.getElementById('block').value;
         const lot = document.getElementById('lot').value;
         const lotArea = Number(document.getElementById('lotArea').value);
@@ -231,17 +230,15 @@
         const monthly = Number(document.getElementById('monthly').value);
         const dueDate = document.getElementById('dueDate').value;
         const terms = document.getElementById('terms').value;
+        const regDate = new Date().toISOString(); // Start of registration
 
         if(!name || !total || !monthly || !dueDate || !terms || !block || !lot) return alert("Paki-kumpleto lahat.");
 
-        const q = query(collection(db, "clients"), where("location", "==", loc));
-        const snapshot = await getDocs(q);
-        if (snapshot.size >= PROPERTIES[loc]) return alert("❌ SOLDOUT sa " + loc);
-
         try {
             await addDoc(collection(db, "clients"), {
-                name, location: loc, block, lot, total, lotArea,
+                name, location: loc, projectName: pName, block, lot, total, lotArea,
                 monthly, dueDate, termsMonths: terms,
+                registrationDate: regDate,
                 paid: 0, payments: []
             });
             alert("✅ Client Registered!");
