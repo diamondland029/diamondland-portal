@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamondland - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #0d0d0d; color: white; font-family: 'Segoe UI', sans-serif; }
+        .gold-text { color: #f1c40f; }
+        
+        /* Box Styling */
+        .card-dark { 
+            background: #161616; 
+            border: 1px solid #333; 
+            padding: 20px; 
+            border-radius: 15px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .input-dark { background: #1a1a1a; border: 1px solid #333; color: white !important; margin-bottom: 15px; }
+        .input-dark::placeholder { color: #aaaaaa; }
+        .input-dark:focus { background: #222; border-color: #f1c40f; color: white; box-shadow: none; }
+        
+        select.input-dark option { background: #1a1a1a; color: white; }
+
+        .stat-box { 
+            background: linear-gradient(145deg, #1e1e1e, #111); 
+            border: 1px solid #f1c40f; 
+            padding: 20px; 
+            border-radius: 12px; 
+            text-align: center; 
+            margin-bottom: 25px;
+        }
+
+        /* Property Status Scrollable Area */
+        .slot-container { 
+            max-height: 280px; 
+            overflow-y: auto; 
+            padding-right: 5px; 
+            margin-bottom: 15px;
+        }
+        .slot-card { background: #1a1a1a; border: 1px solid #444; border-radius: 10px; padding: 15px; margin-bottom: 10px; color: white; position: relative; }
+        .progress { height: 8px; background-color: #333; margin-top: 10px; }
+        .progress-bar { background-color: #f1c40f; }
+        .btn-delete-prop { position: absolute; top: 5px; right: 8px; background: none; border: none; color: #ff4d4d; font-size: 0.8rem; cursor: pointer; }
+
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .property-card {
+            background: linear-gradient(145deg, #1a1a1a, #111);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .property-card:hover { border-color: #f1c40f; transform: translateY(-5px); color: #f1c40f; }
+        
+        .section-title { border-left: 4px solid #f1c40f; padding-left: 15px; margin-top: 40px; margin-bottom: 20px; color: white; font-weight: bold; font-size: 1.1rem; }
+        .form-label { color: #bbb !important; font-size: 0.85rem; margin-bottom: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="gold-text fw-bold m-0">DIAMONDLAND PORTAL</h1>
+        <a href="index.html" class="btn btn-outline-danger btn-sm">Log Out</a>
+    </div>
+
+    <div class="stat-box">
+        <h5 class="text-uppercase small mb-2">Expected Collection (This Month)</h5>
+        <h2 class="gold-text fw-bold m-0" id="monthlyTotal">₱ 0.00</h2>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4 d-flex flex-column">
+            <h4 class="section-title">PROPERTY STATUS</h4>
+            <div id="slotTracker" class="slot-container">
+                </div>
+
+            <h4 class="section-title">MANAGE PROPERTIES</h4>
+            <div class="card-dark flex-grow-1">
+                <div>
+                    <label class="form-label">Property Name</label>
+                    <input id="newPropName" type="text" class="form-control input-dark" placeholder="Name">
+                    <label class="form-label">Max Slot</label>
+                    <input id="newPropLimit" type="number" class="form-control input-dark" placeholder="Limit">
+                </div>
+                <button class="btn btn-outline-warning w-100 fw-bold mt-2" id="savePropBtn">SAVE PROPERTY</button>
+            </div>
+        </div>
+
+        <div class="col-md-8 d-flex flex-column">
+            <h4 class="section-title">SELECT PROPERTY</h4>
+            <div class="property-grid mb-3" id="propertyGrid">
+                </div>
+
+            <h4 class="section-title">CLIENT REGISTRATION</h4>
+            <div class="card-dark flex-grow-1">
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label class="form-label">Full Name</label>
+                        <input id="name" class="form-control input-dark" placeholder="Juan Dela Cruz">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Location</label>
+                        <select id="location" class="form-select input-dark"></select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Block</label>
+                        <input id="block" class="form-control input-dark" placeholder="0">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Lot</label>
+                        <input id="lot" class="form-control input-dark" placeholder="0">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Lot Area (sqm)</label>
+                        <input id="lotArea" type="number" class="form-control input-dark" placeholder="0">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Total Price (TCP)</label>
+                        <input id="total" type="number" class="form-control input-dark" placeholder="0.00">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label gold-text">Monthly Pay</label>
+                        <input id="monthly" type="number" class="form-control input-dark" placeholder="0.00">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label gold-text">Due Day</label>
+                        <input id="dueDate" type="number" class="form-control input-dark" placeholder="1-31">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label gold-text">Terms (Months)</label>
+                        <input id="terms" type="number" class="form-control input-dark" placeholder="Mos">
+                    </div>
+                </div>
+                <button class="btn btn-warning w-100 mt-2 fw-bold py-2" style="background: #f1c40f; color: black;" id="saveBtn">
+                    REGISTER CLIENT
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyAY-MhEi5XevlyqsmZHcuAxVYhnP_gsxqI", projectId: "payment-tracker-3f604" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let PROPERTIES = JSON.parse(localStorage.getItem('diamondland_props')) || { "Amadeo": 50, "Silang": 40, "Tagaytay": 30, "Indang": 60, "Siargao": 25 };
+
+    async function loadDashboard() {
+        const querySnapshot = await getDocs(collection(db, "clients"));
+        const counts = {};
+        let monthlyExpected = 0;
+        Object.keys(PROPERTIES).forEach(p => counts[p] = 0);
+
+        querySnapshot.forEach((doc) => {
+            const d = doc.data();
+            if(counts[d.location] !== undefined) counts[d.location]++;
+            if(d.paid < d.total) monthlyExpected += (Number(d.monthly) || 0);
+        });
+
+        document.getElementById('monthlyTotal').innerText = "₱ " + monthlyExpected.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+        const trackerDiv = document.getElementById('slotTracker');
+        const gridDiv = document.getElementById('propertyGrid');
+        const locSelect = document.getElementById('location');
+
+        trackerDiv.innerHTML = ""; gridDiv.innerHTML = ""; locSelect.innerHTML = "";
+
+        for (const [name, total] of Object.entries(PROPERTIES)) {
+            const used = counts[name] || 0;
+            const percent = (used / total) * 100;
+
+            trackerDiv.innerHTML += `
+                <div class="slot-card">
+                    <button class="btn-delete-prop" onclick="deleteProperty('${name}')">✖</button>
+                    <div class="d-flex justify-content-between mb-0 small">
+                        <span class="fw-bold">${name}</span>
+                        <span>${used}/${total}</span>
+                    </div>
+                    <div class="progress"><div class="progress-bar" style="width: ${percent}%"></div></div>
+                </div>`;
+            gridDiv.innerHTML += `<a href="${name.toLowerCase()}.html" class="property-card">🏡 ${name}</a>`;
+            locSelect.innerHTML += `<option value="${name}">${name}</option>`;
+        }
+    }
+
+    document.getElementById('savePropBtn').onclick = () => {
+        const name = document.getElementById('newPropName').value.trim();
+        const limit = Number(document.getElementById('newPropLimit').value);
+        if(!name || !limit) return alert("Paki-lagay ang pangalan at limit.");
+        PROPERTIES[name] = limit;
+        localStorage.setItem('diamondland_props', JSON.stringify(PROPERTIES));
+        loadDashboard();
+        document.getElementById('newPropName').value = "";
+        document.getElementById('newPropLimit').value = "";
+    };
+
+    window.deleteProperty = (name) => {
+        if(confirm(`Sigurado ka bang buburahin ang ${name}?`)) {
+            delete PROPERTIES[name];
+            localStorage.setItem('diamondland_props', JSON.stringify(PROPERTIES));
+            loadDashboard();
+        }
+    };
+
+    document.getElementById('saveBtn').onclick = async () => {
+        const name = document.getElementById('name').value;
+        const loc = document.getElementById('location').value;
+        const block = document.getElementById('block').value;
+        const lot = document.getElementById('lot').value;
+        const lotArea = Number(document.getElementById('lotArea').value);
+        const total = Number(document.getElementById('total').value);
+        const monthly = Number(document.getElementById('monthly').value);
+        const dueDate = document.getElementById('dueDate').value;
+        const terms = document.getElementById('terms').value;
+
+        if(!name || !total || !monthly || !dueDate || !terms || !block || !lot) return alert("Paki-kumpleto lahat.");
+
+        const q = query(collection(db, "clients"), where("location", "==", loc));
+        const snapshot = await getDocs(q);
+        if (snapshot.size >= PROPERTIES[loc]) return alert("❌ SOLDOUT sa " + loc);
+
+        try {
+            await addDoc(collection(db, "clients"), {
+                name, location: loc, block, lot, total, lotArea,
+                monthly, dueDate, termsMonths: terms,
+                paid: 0, payments: []
+            });
+            alert("✅ Client Registered!");
+            window.location.reload();
+        } catch (e) { alert("Error: " + e.message); }
+    };
+
+    window.deleteProperty = deleteProperty;
+    loadDashboard();
+</script>
+
+</body>
+</html>
